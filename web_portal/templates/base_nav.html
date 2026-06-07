@@ -1,0 +1,14 @@
+<div class="inline-flex p-1 bg-slate-200/70 rounded-xl gap-1">
+    <a href="/dashboard" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm {% if active_page == 'dashboard' %}font-bold bg-white text-indigo-600 shadow-sm{% else %}font-semibold text-slate-600 hover:bg-white/60 hover:text-slate-900{% endif %} transition-all">
+        <i class='bx bxs-dashboard'></i> Dashboard Overview
+    </a>
+    <a href="/forecast" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm {% if active_page == 'forecast' %}font-bold bg-white text-indigo-600 shadow-sm{% else %}font-semibold text-slate-600 hover:bg-white/60 hover:text-slate-900{% endif %} transition-all">
+        <i class='bx bx-trending-up'></i> Demand Forecasting
+    </a>
+    <a href="/theft" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm {% if active_page == 'theft' %}font-bold bg-white text-indigo-600 shadow-sm{% else %}font-semibold text-slate-600 hover:bg-white/60 hover:text-slate-900{% endif %} transition-all">
+        <i class='bx bx-error-circle'></i> Theft Detection
+    </a>
+    <a href="/evaluation" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm {% if active_page == 'evaluation' %}font-bold bg-white text-indigo-600 shadow-sm{% else %}font-semibold text-slate-600 hover:bg-white/60 hover:text-slate-900{% endif %} transition-all">
+        <i class='bx bx-target-lock'></i> Model Evaluation
+    </a>
+</div>

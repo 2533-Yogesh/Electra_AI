@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electra AI - Load Forecasting Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans antialiased">
+    <div class="max-w-7xl mx-auto p-6 space-y-6">
+        
+        <div class="flex items-center justify-between pb-5 border-b border-slate-200">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">⚡</span>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Electra <span class="text-indigo-600">AI</span></h1>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">CSPDCL Enterprise Integration</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-sm font-medium text-slate-600 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-sm">
+                    👤 User: <strong class="text-slate-900">{{ username }}</strong> | Privilege: <strong class="text-indigo-600">{{ role }}</strong>
+                </div>
+                <a href="/logout" class="flex items-center gap-1 px-4 py-2 bg-rose-50 text-rose-600 text-xs font-bold rounded-xl border border-rose-100 uppercase">Log Out</a>
+            </div>
+        </div>
+
+        <div class="inline-flex p-1 bg-slate-200/70 rounded-xl gap-1">
+            <a href="/dashboard" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60">Dashboard</a>
+            <a href="/forecast" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold bg-white text-indigo-600 shadow-sm">Demand Forecasting</a>
+            <a href="/theft" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60">Theft Detection</a>
+            <a href="/evaluation" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60">Model Evaluation</a>
+        </div>
+
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-bold text-slate-900">📈 Load Demand Forecasting Engine</h2>
+                <p class="text-slate-500 text-sm">7-Day time-series predictive curves computed over regional grid locations.</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Feeder Line</label>
+                    <select id="feederSelect" onchange="runForecastPipeline()" class="bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none min-w-[180px]">
+                        <option value="">Upload file first...</option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Transformer Node (DTR)</label>
+                    <select id="dtrSelect" onchange="runForecastPipeline()" class="bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none min-w-[200px]">
+                        <option value="Aggregate Feeder Demand">Aggregate Feeder Load</option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Upload Grid Metrics</label>
+                    <input type="file" id="forecastFile" onchange="runForecastPipeline(true)" class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 cursor-pointer"/>
+                </div>
+            </div>
+        </div>
+
+        <div id="forecast-alert" class="text-center p-8 bg-amber-50 border border-amber-100 text-amber-700 rounded-2xl font-semibold text-sm">
+            ⚠️ Please browse and select your CSV dataset monitoring sheet to build localized area forecast line maps.
+        </div>
+
+        <div id="forecast-metrics" class="hidden grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm shadow-slate-100/40">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Current Grid Load</p>
+                <h2 id="lbl-current-load" class="text-3xl font-black text-slate-800 mt-1">-- <span class="text-sm font-medium text-slate-400">kWh</span></h2>
+            </div>
+            <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm shadow-slate-100/40">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Historical Average Load</p>
+                <h2 id="lbl-avg-load" class="text-3xl font-black text-slate-800 mt-1">-- <span class="text-sm font-medium text-slate-400">kWh</span></h2>
+            </div>
+            <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm shadow-indigo-100/20 border-l-4 border-l-indigo-600">
+                <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">🤖 Projected Next-Day Load</p>
+                <h2 id="lbl-projected-load" class="text-3xl font-black text-indigo-600 mt-1">-- <span class="text-sm font-medium text-indigo-400">kWh</span></h2>
+            </div>
+        </div>
+
+        <div id="forecast-workspace" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm h-[400px]">
+                <canvas id="forecastChart" class="w-full max-h-[380px]"></canvas>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-y-auto max-h-[400px] shadow-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-400 sticky top-0 px-4 py-3">
+                            <th class="p-4">Timeline Axis</th>
+                            <th class="p-4">Predicted Demand (kWh)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="forecast-table-body" class="text-sm font-medium text-slate-700 divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let chartInstance = null;
+
+        function runForecastPipeline(isNewFileUpload = false) {
+            const fileInput = document.getElementById('forecastFile');
+            const workspace = document.getElementById('forecast-workspace');
+            const metricsPanel = document.getElementById('forecast-metrics');
+            const alertBox = document.getElementById('forecast-alert');
+            const tableBody = document.getElementById('forecast-table-body');
+            
+            const feederSelect = document.getElementById('feederSelect');
+            const dtrSelect = document.getElementById('dtrSelect');
+
+            if (fileInput.files.length === 0) return;
+
+            alertBox.innerHTML = `⏳ Uploading stream matrix and calculating area-specific models via Prophet core...`;
+            alertBox.className = "text-center p-8 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-2xl font-semibold text-sm";
+            alertBox.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            // Forward selections only if this isn't a fresh upload trace reset
+            if (!isNewFileUpload) {
+                formData.append('feeder_id', feederSelect.value);
+                formData.append('dtr_id', dtrSelect.value);
+            }
+
+            fetch('/portal/forecast_data', { method: 'POST', body: formData })
+                .then(res => {
+                    if (!res.ok) throw new Error("Data parsing exception. Verify schema requirements.");
+                    return res.json();
+                })
+                .then(resData => {
+                    if (resData.status === "success") {
+                        // Store the session payload array cleanly into storage for the evaluation template
+                        sessionStorage.setItem('latestMetrics', JSON.stringify(resData));
+
+                        alertBox.classList.add('hidden');
+                        metricsPanel.classList.remove('hidden');
+                        workspace.classList.remove('hidden');
+
+                        // 🌟 DYNAMIC SELECTION LOOP: Rebuild options based on explicit backend calculation map
+                        if (isNewFileUpload) {
+                            feederSelect.innerHTML = resData.feeders.map(f => `<option value="${f}">${f}</option>`).join('');
+                            feederSelect.value = resData.selected_feeder;
+                        }
+                        
+                        // Rebuild transformers matching the active line
+                        const currentDtrVal = dtrSelect.value;
+                        dtrSelect.innerHTML = `<option value="Aggregate Feeder Demand">Aggregate Feeder Load</option>` + 
+                            resData.dtrs.map(d => `<option value="${d}" ${d === currentDtrVal ? 'selected' : ''}>${d}</option>`).join('');
+
+                        // Update summary metrics cards
+                        document.getElementById('lbl-current-load').innerHTML = `${resData.metrics.current_load.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})} <span class="text-xs font-medium text-slate-400">kWh</span>`;
+                        document.getElementById('lbl-avg-load').innerHTML = `${resData.metrics.historical_avg_load.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})} <span class="text-xs font-medium text-slate-400">kWh</span>`;
+                        document.getElementById('lbl-projected-load').innerHTML = `${resData.metrics.projected_next_day.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})} <span class="text-xs font-medium text-indigo-400">kWh</span>`;
+
+                        // Bind predictions data rows to table layout
+                        tableBody.innerHTML = resData.predictions.map(row => `
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-4 font-bold text-slate-900">${row.Date}</td>
+                                <td class="p-4 text-indigo-600 font-extrabold">${parseFloat(row.yhat).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            </tr>
+                        `).join('');
+
+                        // ==========================================
+                        // 📊 DUAL-TRACE OVERLAY PLOT ARCHITECTURE
+                        // ==========================================
+                        const ctx = document.getElementById('forecastChart').getContext('2d');
+                        if (chartInstance) chartInstance.destroy();
+
+                        // Parse out variables to build historical baseline and future projections traces
+                        const historyDates = resData.historical.map(h => h.Date);
+                        const historyValues = resData.historical.map(h => h.y);
+                        
+                        const futureDates = resData.predictions.map(p => p.Date);
+                        const futureValues = resData.predictions.map(p => p.yhat);
+
+                        chartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: [...historyDates, ...futureDates],
+                                datasets: [
+                                    {
+                                        label: 'Historical Load Profile',
+                                        data: [...historyValues, ...Array(futureValues.length).fill(null)],
+                                        borderColor: '#64748b',
+                                        borderWidth: 2,
+                                        pointRadius: 0,
+                                        fill: false
+                                    },
+                                    {
+                                        label: '7-Day AI Forecast Projections',
+                                        data: [...Array(historyValues.length - 1).fill(null), historyValues[historyValues.length - 1], ...futureValues],
+                                        borderColor: '#4f46e5',
+                                        backgroundColor: 'rgba(79, 70, 229, 0.04)',
+                                        borderWidth: 3,
+                                        pointRadius: 3,
+                                        pointBackgroundColor: '#4f46e5',
+                                        fill: true,
+                                        tension: 0.15
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { weight: 'bold', size: 11 } } }
+                                },
+                                scales: {
+                                    x: { grid: { display: false } },
+                                    y: { ticks: { callback: value => value.toLocaleString() } }
+                                }
+                            }
+                        });
+                    }
+                }).catch(err => { 
+                    alertBox.innerHTML = `❌ Data Processing Failure: ${err.message}`;
+                    alertBox.className = "text-center p-8 bg-rose-50 border border-rose-100 text-rose-700 rounded-2xl font-semibold text-sm";
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electra AI - Theft Isolation Matrix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans antialiased">
+    <div class="max-w-7xl mx-auto p-6 space-y-6">
+        
+<!-- Header -->
+        <div class="flex items-center justify-between pb-5 border-b border-slate-200">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">⚡</span>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Electra <span class="text-indigo-600">AI</span></h1>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">CSPDCL Enterprise Integration</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-sm font-medium text-slate-600 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-sm">
+                    👤 User: <strong class="text-slate-900">{{ username }}</strong> | Privilege: <strong class="text-indigo-600">{{ role }}</strong>
+                </div>
+                <!-- 🌟 ADDED LOG OUT INTERACTION GATE -->
+                <a href="/logout" class="flex items-center gap-1.5 px-4 py-2 bg-rose-50 text-rose-600 text-xs font-bold rounded-xl border border-rose-100 uppercase tracking-wide hover:bg-rose-100 transition-all">Log Out</a>
+            </div>
+        </div>
+
+        <div class="inline-flex p-1 bg-slate-200/70 rounded-xl gap-1">
+            <a href="/dashboard" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60">Dashboard</a>
+            <a href="/forecast" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60">Demand Forecasting</a>
+            <a href="/theft" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold bg-white text-indigo-600 shadow-sm">Theft Detection</a>
+            <a href="/evaluation" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60">Model Evaluation</a>
+        </div>
+
+        <!-- Upper Control Core -->
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-bold text-slate-900">🚨 Non-Technical Loss (NTL) Anomaly Matrix</h2>
+                <p class="text-slate-500 text-sm">Unsupervised isolation forest vectors mapping malicious energy drops and meter bypasses.</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Feeder Line</label>
+                    <select id="feederSelect" onchange="runTheftPipeline()" class="bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none min-w-[150px]">
+                        <option value="All Feeders">All Feeders</option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Transformer Node (DTR)</label>
+                    <select id="dtrSelect" onchange="runTheftPipeline()" class="bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none min-w-[180px]">
+                        <option value="All DTRs">All DTRs</option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Upload Grid Matrix</label>
+                    <input type="file" id="theftFile" onchange="runTheftPipeline(true)" class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-rose-50 file:text-rose-600 hover:file:bg-rose-100 cursor-pointer"/>
+                </div>
+            </div>
+        </div>
+
+        <div id="theft-alert" class="text-center p-8 bg-amber-50 border border-amber-100 text-amber-700 rounded-2xl font-semibold text-sm">
+            ⚠️ Browse and upload your grid validation spreadsheet data to trace high-risk consumer anomalies.
+        </div>
+        
+        <div id="cloud-toast" class="hidden p-4 bg-emerald-600 text-white font-bold rounded-xl text-xs flex items-center justify-between shadow-lg shadow-emerald-700/20">
+            <span id="cloud-toast-msg">🚀 ☁️ Neon Cloud Connected! Live data stream synced.</span>
+            <button onclick="this.parentElement.classList.add('hidden')" class="text-white hover:text-slate-200 font-bold">✕</button>
+        </div>
+
+        <div id="theft-metrics" class="hidden grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Active Nodes</p>
+                <h2 id="lbl-total-nodes" class="text-3xl font-black text-slate-800 mt-1">--</h2>
+            </div>
+            <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm border-l-4 border-l-rose-500">
+                <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Flagged Suspects (Isolation Forest)</p>
+                <h2 id="lbl-flagged" class="text-3xl font-black text-rose-600 mt-1">--</h2>
+            </div>
+            <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Peak System Load</p>
+                <h2 id="lbl-peak" class="text-3xl font-black text-slate-800 mt-1">-- <span class="text-xs text-slate-400 font-medium">kWh</span></h2>
+            </div>
+        </div>
+
+        <div id="theft-charts" class="hidden space-y-6">
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
+                <h3 class="text-sm font-bold text-slate-900">📊 Multi-Tenant Load Monitoring Profile</h3>
+                <div class="h-[300px]"><canvas id="loadLineChart"></canvas></div>
+            </div>
+        </div>
+
+        <div id="theft-workspace" class="hidden bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">📋 Actionable Vigilance Report Logs (High Risk Profiles)</h3>
+                    <p class="text-[11px] text-slate-400 font-medium">Review machine outputs locally before committing anomalies permanently to corporate databases.</p>
+                </div>
+                <!-- Explicit Batch Commit Button -->
+                <button id="btn-sync-db" onclick="commitRecordsToNeon()" class="hidden items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-600/10">
+                    <i class='bx bx-cloud-upload text-sm'></i> Commit Verified List to DB
+                </button>
+            </div>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-400 p-4">
+                        <th class="p-4">Timeline Axis</th>
+                        <th class="p-4">Feeder ID</th>
+                        <th class="p-4">DTR Transformer ID</th>
+                        <th class="p-4">Consumer Account No</th>
+                        <th class="p-4">Consumption (kWh)</th>
+                        <th class="p-4">Risk Index Score</th>
+                        <th class="p-4">Vigilance Action</th>
+                    </tr>
+                </thead>
+                <tbody id="theft-table-body" class="text-sm font-medium text-slate-700 divide-y divide-slate-100"></tbody>
+            </table>
+            <div id="empty-success-msg" class="hidden p-8 text-center bg-emerald-50 text-emerald-700 font-bold">
+                🟢 Outstanding! No High-Risk theft anomalies detected inside this grid threshold loop.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let loadChartInstance = null;
+        let cachedHighRiskAnomalies = [];
+
+        function runTheftPipeline(isNewFileUpload = false) {
+            const fileInput = document.getElementById('theftFile');
+            const alertBox = document.getElementById('theft-alert');
+            const metricsPanel = document.getElementById('theft-metrics');
+            const chartPanel = document.getElementById('theft-charts');
+            const workspace = document.getElementById('theft-workspace');
+            const tableBody = document.getElementById('theft-table-body');
+            const successMsg = document.getElementById('empty-success-msg');
+            const syncBtn = document.getElementById('btn-sync-db');
+            
+            const feederSelect = document.getElementById('feederSelect');
+            const dtrSelect = document.getElementById('dtrSelect');
+
+            if (fileInput.files.length === 0) return;
+
+            alertBox.innerHTML = `⏳ Processing dataset algorithms against spatial tree vector parameters...`;
+            alertBox.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            if (!isNewFileUpload) {
+                formData.append('feeder_id', feederSelect.value);
+                formData.append('dtr_id', dtrSelect.value);
+            }
+
+            fetch('/portal/theft_data', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(resData => {
+                    if (resData.status === "success") {
+                        alertBox.classList.add('hidden');
+                        metricsPanel.classList.remove('hidden');
+                        chartPanel.classList.remove('hidden');
+                        workspace.classList.remove('hidden');
+
+                        if (isNewFileUpload) {
+                            feederSelect.innerHTML = `<option value="All Feeders">All Feeders</option>` + 
+                                resData.feeders.map(f => `<option value="${f}">${f}</option>`).join('');
+                        }
+                        
+                        const currentDtrVal = dtrSelect.value;
+                        dtrSelect.innerHTML = `<option value="All DTRs">All DTRs</option>` + 
+                            resData.dtrs.map(d => `<option value="${d}" ${d === currentDtrVal ? 'selected' : ''}>${d}</option>`).join('');
+
+                        document.getElementById('lbl-total-nodes').innerText = resData.overview.total_nodes;
+                        document.getElementById('lbl-flagged').innerText = resData.overview.flagged_suspects;
+                        document.getElementById('lbl-peak').innerText = resData.overview.peak_load.toLocaleString(undefined, {maximumFractionDigits:1});
+
+                        cachedHighRiskAnomalies = resData.data.filter(r => r.Risk_Level.includes("High Risk"));
+                        
+                        if (cachedHighRiskAnomalies.length > 0) {
+                            successMsg.classList.add('hidden');
+                            syncBtn.style.display = 'flex';
+                            tableBody.innerHTML = cachedHighRiskAnomalies.sort((a,b) => b.Risk_Score - a.Risk_Score).map(row => `
+                                <tr class="hover:bg-rose-50/10 transition-all">
+                                    <td class="p-4 text-slate-900 font-bold">${row.Date}</td>
+                                    <td class="p-4 font-mono">${row.Feeder_ID}</td>
+                                    <td class="p-4 font-mono">${row.DTR_ID}</td>
+                                    <td class="p-4 font-mono text-indigo-600 font-bold">${row.Consumer_No}</td>
+                                    <td class="p-4 font-semibold">${row.Consumption_kWh.toFixed(1)}</td>
+                                    <td class="p-4 text-rose-600 font-extrabold">${row.Risk_Score.toFixed(1)}%</td>
+                                    <td class="p-4"><span class="px-2.5 py-1 text-xs font-black rounded-full bg-rose-50 text-rose-600">High Alert 🚨</span></td>
+                                </tr>
+                            `).join('');
+                        } else {
+                            tableBody.innerHTML = "";
+                            syncBtn.style.display = 'none';
+                            successMsg.classList.remove('hidden');
+                        }
+
+                        const ctx = document.getElementById('loadLineChart').getContext('2d');
+                        if (loadChartInstance) loadChartInstance.destroy();
+                        const uniqueDates = [...new Set(resData.data.map(r => r.Date))].sort();
+                        const uniqueConsumers = [...new Set(resData.data.map(r => r.Consumer_No))].slice(0, 5);
+                        
+                        const datasetTraces = uniqueConsumers.map((consumer, cIdx) => {
+                            const chromaticPalette = ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+                            return {
+                                label: `Consumer No: ${consumer}`,
+                                data: uniqueDates.map(d => {
+                                    const record = resData.data.find(r => r.Date === d && r.Consumer_No === consumer);
+                                    return record ? record.Consumption_kWh : null;
+                                }),
+                                borderColor: chromaticPalette[cIdx % chromaticPalette.length],
+                                borderWidth: 2,
+                                pointRadius: 2,
+                                fill: false
+                            };
+                        });
+
+                        loadChartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: { labels: uniqueDates, datasets: datasetTraces },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: { x: { grid: { display: false } } }
+                            }
+                        });
+                    }
+                }).catch(err => {
+                    alertBox.innerHTML = `❌ Processing Fault: ${err.message}`;
+                });
+        }
+
+        function commitRecordsToNeon() {
+            if (cachedHighRiskAnomalies.length === 0) return;
+            
+            const toastBox = document.getElementById('cloud-toast');
+            const toastMsg = document.getElementById('cloud-toast-msg');
+            const syncBtn = document.getElementById('btn-sync-db');
+            
+            syncBtn.innerText = "⏳ Syncing to Cloud...";
+            syncBtn.disabled = true;
+
+            fetch('/portal/sync_theft_audit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ anomalies: cachedHighRiskAnomalies })
+            })
+            .then(res => res.json())
+            .then(result => {
+                syncBtn.innerText = "Commit Verified List to DB";
+                syncBtn.disabled = false;
+                
+                toastBox.classList.remove('hidden');
+                if (result.success) {
+                    toastMsg.innerText = `🚀 ${result.message}`;
+                    toastBox.className = "p-4 bg-emerald-600 text-white font-bold rounded-xl text-xs flex items-center justify-between shadow-lg shadow-emerald-700/20";
+                } else {
+                    toastMsg.innerText = `❌ Transaction Aborted: ${result.message}`;
+                    toastBox.className = "p-4 bg-rose-600 text-white font-bold rounded-xl text-xs flex items-center justify-between shadow-lg shadow-rose-700/20";
+                }
+            })
+            .catch(err => {
+                syncBtn.innerText = "Commit Verified List to DB";
+                syncBtn.disabled = false;
+                toastMsg.innerText = `❌ Network Error: ${err.message}`;
+                toastBox.className = "p-4 bg-rose-600 text-white font-bold rounded-xl text-xs flex items-center justify-between shadow-lg shadow-rose-700/20";
+                toastBox.classList.remove('hidden');
+            });
+        }
+    </script>
+</body>
+</html>

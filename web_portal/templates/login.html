@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electra AI - Secure Gateway</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container" id="container">
+
+    <div class="form-box login">
+        <form id="loginForm">
+            <h1>Login</h1>
+            
+            <div id="login-alert" class="alert-banner" style="display: none; padding: 10px; margin-bottom: 15px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center;"></div>
+
+            <div class="input-box">
+                <input type="text" placeholder="Username" id="loginUsername" required autocomplete="username">
+                <i class='bx bxs-user'></i>
+            </div>
+
+            <div class="input-box">
+                <input type="password" placeholder="Password" id="loginPassword" required autocomplete="current-password">
+                <i class='bx bxs-lock-alt'></i>
+            </div>
+
+            <div class="forgot-link">
+                <a href="#">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn">Login</button>
+        </form>
+    </div>
+
+    <div class="form-box register">
+        <form id="registerForm">
+            <h1>Registration</h1>
+            
+            <div id="register-alert" class="alert-banner" style="display: none; padding: 10px; margin-bottom: 15px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center;"></div>
+
+            <div class="input-box">
+                <input type="text" placeholder="Username" id="regUsername" required autocomplete="off">
+                <i class="bx bxs-user"></i>
+            </div>
+
+            <!-- <div class="input-box">
+                <input type="email" placeholder="Email" id="regEmail" required autocomplete="email">
+                <i class="bx bxs-envelope"></i>
+            </div>
+
+            <div class="input-box">
+                <input type="tel" placeholder="Phone Number" id="regPhone" required autocomplete="tel">
+                <i class="bx bxs-phone"></i>
+            </div> -->
+
+<div class="input-box">
+    <select id="regRole" required>
+        <option value="" disabled selected>Select Operational Scope</option>
+        <option value="Engineer">Substation Engineer</option>
+        <option value="Vigilance">Vigilance Officer</option>
+        <option value="Admin">System Administrator</option>
+    </select>
+    <i class="bx bxs-shield-quarter"></i>
+</div>
+
+            <div class="input-box">
+                <input type="password" placeholder="Password" id="regPassword" required autocomplete="new-password">
+                <i class="bx bxs-lock-alt"></i>
+            </div>
+
+            <div class="input-box">
+                <input type="password" placeholder="Confirm Password" id="regConfirmPassword" required autocomplete="new-password">
+                <i class="bx bxs-lock-alt"></i>
+            </div>
+
+            <button type="submit" class="btn">Register</button>
+        </form>
+    </div>
+
+    <div class="toggle-box">
+        <div class="toggle-panel toggle-left">
+            <h1>Welcome</h1>
+            <p>Don't have an account?</p>
+            <button class="btn register-btn" type="button">Register</button>
+        </div>
+
+        <div class="toggle-panel toggle-right">
+            <h1>Welcome Back</h1>
+            <p>Already have an account?</p>
+            <button class="btn login-btn" type="button">Login</button>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/login_ops.js') }}"></script>
+<script src="{{ url_for('static', filename='js/register_ops.js') }}"></script>
+
+</body>
+</html>

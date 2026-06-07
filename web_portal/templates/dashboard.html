@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electra AI - Command Center Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen font-sans antialiased">
+
+    <div class="max-w-7xl mx-auto p-6 space-y-6">
+        
+        <div class="flex items-center justify-between pb-5 border-b border-slate-200">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">⚡</span>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">
+                    Electra <span class="text-indigo-600">AI</span>
+                </h1>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">
+                    CSPDCL Enterprise Integration
+                </span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 text-sm font-medium text-slate-600 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-sm">
+                    <span class="flex items-center gap-1.5">
+                        <i class='bx bxs-user-circle text-slate-400 text-lg'></i>
+                        User: <strong class="text-slate-900">{{ username }}</strong>
+                    </span>
+                    <span class="text-slate-200">|</span>
+                    <span class="flex items-center gap-1.5">
+                        <i class='bx bxs-shield-quarter text-indigo-400 text-lg'></i>
+                        Privilege: <strong class="text-indigo-600">{{ role }}</strong>
+                    </span>
+                </div>
+                <a href="/logout" class="flex items-center gap-1 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-100 uppercase tracking-wider transition-all duration-150 active:scale-[0.98]">
+                    <i class='bx bx-log-out text-sm'></i> Log Out
+                </a>
+            </div>
+        </div>
+
+        <div class="inline-flex p-1 bg-slate-200/70 rounded-xl gap-1">
+            <a href="/dashboard" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold bg-white text-indigo-600 shadow-sm transition-all">
+                <i class='bx bxs-dashboard'></i> Dashboard Overview
+            </a>
+            <a href="/forecast" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60 hover:text-slate-900 transition-all">
+                <i class='bx bx-trending-up'></i> Demand Forecasting
+            </a>
+            <a href="/theft" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60 hover:text-slate-900 transition-all">
+                <i class='bx bx-error-circle'></i> Theft Detection
+            </a>
+            <a href="/evaluation" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white/60 hover:text-slate-900 transition-all">
+                <i class='bx bx-target-lock'></i> Model Evaluation
+            </a>
+        </div>
+
+        <div class="space-y-1">
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Smart Energy Monitoring Platform</h2>
+            <p class="text-slate-500 text-base">Advanced Machine Learning Suite for Automated Power Demand Forecasting & Non-Technical Loss (Theft) Detection.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm shadow-slate-100/50 flex flex-col justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Active Load</span>
+                    <div class="text-3xl font-black text-slate-900 mt-2 flex items-baseline gap-1">
+                        1,250 <span class="text-base font-semibold text-slate-500">MW</span>
+                    </div>
+                </div>
+                <span class="text-xs font-bold text-emerald-600 mt-4 flex items-center gap-0.5">▲ 4.2% vs last week</span>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm shadow-slate-100/50 flex flex-col justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Peak Projected Load</span>
+                    <div class="text-3xl font-black text-indigo-600 mt-2 flex items-baseline gap-1">
+                        1,340 <span class="text-base font-semibold text-indigo-400">MW</span>
+                    </div>
+                </div>
+                <span class="text-xs font-medium text-slate-400 mt-4">Prophet Model Prediction</span>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm shadow-slate-100/50 flex flex-col justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Flagged DTR Anomalies</span>
+                    <div class="text-3xl font-black text-rose-600 mt-2 flex items-baseline gap-1">
+                        12 <span class="text-base font-semibold text-rose-400">Nodes</span>
+                    </div>
+                </div>
+                <span class="text-xs font-bold text-rose-600 mt-4 flex items-center gap-1">⚠️ High-Risk Action Required</span>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm shadow-slate-100/50 flex flex-col justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Average Aggregate Risk</span>
+                    <div class="text-3xl font-black text-amber-500 mt-2">76%</div>
+                </div>
+                <span class="text-xs font-medium text-slate-400 mt-4">Hybrid Score Confidence</span>
+            </div>
+        </div>
+
+        {% if role == 'Admin' %}
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div class="space-y-1">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class='bx bxs-shield-quarter text-indigo-600' ></i> Pending User Authorization Requests
+                </h3>
+                <p class="text-slate-500 text-xs">Grant or deny system access permissions to newly registered field profiles.</p>
+            </div>
+            
+            <div id="user-vetting-queue" class="space-y-3">
+                <div class="text-center py-4 text-slate-400 text-xs italic">
+                    🔄 Synchronizing cloud credentials...
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="p-5 bg-blue-50/60 rounded-2xl border border-blue-100 text-blue-800 text-sm font-medium flex items-start gap-3">
+            <i class='bx bx-info-circle text-xl text-blue-500 mt-0.5'></i>
+            <div>
+                <span class="font-bold block mb-0.5">📋 System Status Communication: Operational</span>
+                Welcome back to the command center. Use the horizontal sub-navigation array to route into specialized processing pages for load analytics or loss tree extractions.
+            </div>
+        </div>
+
+    </div>
+
+    {% if role == 'Admin' %}
+    <script>
+        document.addEventListener("DOMContentLoaded", loadPendingQueue);
+
+        function loadPendingQueue() {
+            const queueContainer = document.getElementById('user-vetting-queue');
+            if (!queueContainer) return;
+
+            fetch('/admin/pending_users')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.users.length === 0) {
+                            queueContainer.innerHTML = `
+                                <div class="p-4 bg-emerald-50/50 text-emerald-700 border border-emerald-100 rounded-xl text-center text-xs font-medium flex items-center justify-center gap-2">
+                                    <i class='bx bx-check-shield text-lg'></i> Security database clear. No pending registration requests.
+                                </div>`;
+                            return;
+                        }
+
+                        queueContainer.innerHTML = data.users.map(user => `
+                            <div class="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-xl transition-all hover:bg-white hover:shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">👤</div>
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-xs">ID: <code class="bg-slate-200/60 px-1 py-0.5 rounded text-indigo-600">${user.username}</code></span>
+                                        <span class="text-[10px] text-slate-400 font-semibold">Scope Parameter: <strong class="text-slate-600">${user.role}</strong></span>
+                                    </div>
+                                </div>
+                                <button onclick="approveUserAccount(${user.id}, '${user.username}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-lg transition-all shadow-sm">
+                                    Authorize Access
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+                }).catch(err => { queueContainer.innerHTML = `<div class="text-xs text-rose-500 font-semibold p-2">Failed to synchronize security queue.</div>`; });
+        }
+
+        function approveUserAccount(userId, username) {
+            fetch(`/admin/approve_user/${userId}`, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        loadPendingQueue();
+                    } else {
+                        alert(`Error: ${data.message}`);
+                    }
+                });
+        }
+    </script>
+    {% endif %}
+</body>
+</html>
