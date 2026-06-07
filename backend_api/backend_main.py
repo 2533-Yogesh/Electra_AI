@@ -6,6 +6,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 from prophet import Prophet
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+import io 
 
 app = FastAPI(
     title="CSPDCL Smart Grid Analytics Core Engine",
@@ -48,26 +49,43 @@ def validate_cspdcl_schema(df: pd.DataFrame):
 
 
 # Helper tool to parse uploaded files safely
+
+
 def parse_network_file(file: UploadFile):
     try:
+        # Read the raw incoming network stream buffer completely into memory
+        file_bytes = file.file.read()
+        
+        # Wrap the byte blocks in an in-memory stream bytes container
+        data_stream = io.BytesIO(file_bytes)
+
         if file.filename.endswith(".csv"):
-            df = pd.read_csv(file.file)
+            # 🌟 Linux/Render Fix: Explicitly specify UTF-8 encoding and handle hidden BOM tokens
+            df = pd.read_csv(data_stream, encoding='utf-8', encoding_errors='ignore')
         elif file.filename.endswith((".xls", ".xlsx")):
-            df = pd.read_excel(file.file)
+            df = pd.read_excel(data_stream)
         else:
             raise HTTPException(status_code=400, detail="Unsupported file format. Please upload CSV or Excel.")
         
+        # Clean white spaces from column headers that sometimes sneak into network packets
+        df.columns = df.columns.str.strip()
+
+        # Enforce structural validation schema constraints
         is_valid, validation_errors = validate_cspdcl_schema(df)
         if not is_valid:
             raise HTTPException(status_code=422, detail="; ".join(validation_errors))
             
-        df["Date"] = pd.to_datetime(df["Date"])
+        # 🌟 Linux/Render Fix: Force errors='coerce' so dates parse identically on Linux as on Windows
+        df["Date"] = pd.to_datetime(df["Date"], errors='coerce')
+        
+        # Drop rows where dates failed to parse cleanly
+        df = df.dropna(subset=["Date"])
+        
         return df.sort_values("Date")
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to process data stream matrix: {str(e)}")
-
 
 # --- ENDPOINT 1: THEFT DETECTION ENGINE (FIXED FOR DYNAMIC SELECTION) ---
 @app.post("/api/v1/theft-detection")
