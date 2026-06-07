@@ -256,6 +256,9 @@ def sync_theft_audit():
 # ==============================================================
 # 🚀 INITIALIZATION DIAGNOSTIC RUNTIME GATE
 # ==============================================================
+# ==============================================================
+# 🚀 INITIALIZATION DIAGNOSTIC RUNTIME GATE
+# ==============================================================
 if __name__ == "__main__":
     # Perform cold boot sanity check verification against Neon infrastructure
     try:
@@ -267,4 +270,10 @@ if __name__ == "__main__":
         print(f"❌ ARCHITECTURAL ERROR: Database handshake failed! Cause: {connection_fault}")
         print("⚠️ Application running on backup mode. Database functions will freeze.")
 
-    app.run(port=5000, debug=True)
+    # 🌟 PRODUCTION PORT BINDING FIX:
+    # Read the dynamic random environment port provided by Render cloud,
+    # defaulting back to local 5000 if running on your machine.
+    cloud_port = int(os.environ.get("PORT", 5000))
+    
+    # Force host to listen on 0.0.0.0 so Render's port scanners can read it!
+    app.run(host="0.0.0.0", port=cloud_port, debug=False)
